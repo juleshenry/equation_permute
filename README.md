@@ -10,3 +10,15 @@ When second-order equations can be derived, they are computed and offered as met
 2. Solutions modulo all free variables
 3. Nth-order Combinations
 4. Library from equations
+
+
+# Installation
+
+To use this pyproject.toml file
+Make sure you have Poetry installed.
+Run poetry install to install the specified dependencies.
+
+# Usage
+
+```python go.py --tab "    " --std "WRITE" --outfile "permuted_equations.py"```
+

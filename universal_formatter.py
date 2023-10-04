@@ -5,9 +5,8 @@ from sympy import Symbol, solve, log
 
 TAB = "    "
 TYPE = ": float"
-STD = "WRITEX"
+STD = "WRITE"
 OUTFILE = "vakyume.py"
-
 
 def stdout(s):
     if STD == "WRITE":
@@ -15,7 +14,6 @@ def stdout(s):
             o.write(s + "\n")
     else:
         print(s)
-
 
 class Solver:
 
@@ -77,7 +75,6 @@ class Solver:
                 stdout(TAB * 2 + f"return {t}")
             except:
                 stdout(f"{TAB*2}pass #NotImplementedError")
-        1/0
 
     def analyze(s, i):
         root_dir = os.getcwd() + "/chapters/"
