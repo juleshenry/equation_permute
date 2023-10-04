@@ -159,6 +159,7 @@ if __name__ == "__main__":
             continue
         chap, mods = module.split("_")[0], module.split("_")[1:]
         cls_name = get_class_name(mods)
+        stdout("from scipy import sqrt")
         stdout(f"class {cls_name}:")
         print(cls_name)
         X.analyze(chap)
