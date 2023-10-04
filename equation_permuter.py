@@ -58,33 +58,40 @@ class Solver:
         # print('tokes',tokes)
         return tokes
 
-    def permute(s, eqn, eqn_n):
-        tokes = s.get_tokes(eqn)
+    def permute(self, eqn: str, eqn_n: str):
+        tokens = self.get_tokes(eqn)
         normal_form = eqn.split("=")[1].strip() + " - " + eqn.split("=")[0].strip()
-        for t in tokes:
+        for token in tokens:
             # print("investigating",t)
-            args = sorted(filter(lambda x: x != t, tokes))
+            args = sorted(filter(lambda x: x != token, tokens))
             args = list(map(lambda x:x.split('**')[0].strip(), args))
             typed_args = str(f"{TYPE}, ").join(args)
             if typed_args:
                 typed_args += TYPE
             print(typed_args)
+            token = token.split('**')[0]
             stdout(f"{TAB}@staticmethod")
-            stdout(f'{TAB}def eqn_{eqn_n.replace("-","_")}__{t}({typed_args}):')
+            stdout(f'{TAB}def eqn_{eqn_n.replace("-","_")}__{token}({typed_args}):')
             stdout(f"{TAB}# {eqn.strip().replace('#','')}")
-            try:
-                solns = solve(normal_form, Symbol(t))
-                # print('NORM',normal_form)
-                if not len(solns):
-                    stdout(f"{TAB*2}pass # unable  to solve")
-                    continue
-                stdout(TAB * 2 + "result = []")
-                for soln in solns:
-                    stdout(f"{TAB*2}{t} = {soln}")
-                    stdout(f"{TAB*2}result.append({t})")
-                stdout(TAB * 2 + f"return {t}")
-            except:
-                stdout(f"{TAB*2}pass #NotImplementedError")
+            # try:
+            print('*'*88)
+            print(normal_form)
+            print(Symbol(token))
+            solns = solve(normal_form, (token))
+            print(solns)
+            print('*'*88)
+            # print('NORM',normal_form)
+            if not len(solns):
+                print('FAILED on:',fr'{normal_form}',rf'{token}',sep='\n')
+                stdout(f"{TAB*2}pass # unable  to solve")
+                continue
+            stdout(TAB * 2 + "result = []")
+            for soln in solns:
+                stdout(f"{TAB*2}{token} = {soln}")
+                stdout(f"{TAB*2}result.append({token})")
+            stdout(TAB * 2 + f"return {token}")
+            # except:
+            # stdout(f"{TAB*2}pass #NotImplementedError")
 
     def analyze(s, i):
         root_dir = os.getcwd() + f'//{ROOT}//'
@@ -141,15 +148,19 @@ class SetupMethods:
             pass
 
 
+def get_class_name(mods: str):
+    # ends in .pyeqn, length 6
+    return "".join(x[0].upper() + x[1:] for x in mods)[:-6]
+
 if __name__ == "__main__":
     X = Solver()
     for module in sorted(os.listdir(os.getcwd() + f"/{ROOT}")):
         if not module.startswith('quad'):
             continue
         chap, mods = module.split("_")[0], module.split("_")[1:]
-        cls_name = "".join(x[0].upper() + x[1:] for x in mods)[:-3]
-        print(cls_name)
+        cls_name = get_class_name(mods)
         stdout(f"class {cls_name}:")
+        print(cls_name)
         X.analyze(chap)
     # Run black on the file
     subprocess.run(['black', OUTFILE])
