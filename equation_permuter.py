@@ -9,7 +9,7 @@ TYPE = ": float"
 STD = "WRITE"
 OUTFILE = "vakyume2.py"
 _DEBUG = True
-ROOT = 'tests'
+INFILE = 'fluid_flow_vacuum_lines.pyeqn'
 
 def debug(s:str):
     if _DEBUG:
@@ -93,11 +93,9 @@ class Solver:
             # except:
             # stdout(f"{TAB*2}pass #NotImplementedError")
 
-    def analyze(self, i):
-        root_dir = os.getcwd() + f'//{ROOT}//'
-        get = list(filter(lambda x: i in x, os.listdir(root_dir)))[0]
-        print('xx',root_dir + get)
-        with open(root_dir + get) as file:
+    def analyze(self, infile: str):
+        full_file_path = os.getcwd() +'/'+ infile
+        with open(full_file_path) as file:
             eqn_number = ""
             for l in file.readlines():
                 if x := re.compile("\d{1,2}-\d{1,2}\w{,2}").findall(l):
@@ -157,13 +155,13 @@ if __name__ == "__main__":
     main_solver = Solver()
     # standard import
     stdout("from scipy import sqrt")
-    for module in sorted(os.listdir(os.getcwd() + f"/{ROOT}")):
-        if not module.endswith('.pyeqn'):
-            continue
-        pyeqn_file = module.split("_")
-        cls_name = get_class_name(pyeqn_file)
-        stdout(f"class {cls_name}:")
-        print(cls_name)
-        main_solver.analyze(module)
+    stdout("from sympy import Piecewise,Eqn")
+    if not INFILE.endswith('.pyeqn'):
+        raise ValueError("Must be .pyeqn file")
+    pyeqn_file = INFILE.split("_")
+    cls_name = get_class_name(pyeqn_file)
+    stdout(f"class {cls_name}:")
+    print(cls_name)
+    main_solver.analyze(INFILE)
     # Run black on the file
     subprocess.run(['black', OUTFILE])
