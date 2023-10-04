@@ -144,7 +144,7 @@ class SetupMethods:
 if __name__ == "__main__":
     X = Solver()
     for module in sorted(os.listdir(os.getcwd() + f"/{ROOT}")):
-        if not module.startswith('uni'):
+        if not module.startswith('quad'):
             continue
         chap, mods = module.split("_")[0], module.split("_")[1:]
         cls_name = "".join(x[0].upper() + x[1:] for x in mods)[:-3]
