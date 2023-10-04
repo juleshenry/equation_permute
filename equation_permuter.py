@@ -4,19 +4,15 @@ import time
 from sympy import Symbol, solve, log
 import subprocess
 
-TAB = "    "
-TYPE = ": float"
-STD = "WRITE"
-OUTFILE = "vakyume2.py"
 _DEBUG = True
-INFILE = 'fluid_flow_vacuum_lines.pyeqn'
+
 
 def debug(s:str):
     if _DEBUG:
-        print("[DEBUG]",s)
+        print("[DEBUG]", s)
 
-def stdout(s):
-    if STD == "WRITE":
+def stdout(s: str):
+    if not _DEBUG:
         with open(OUTFILE, "a+") as o:
             o.write(s + "\n")
     else:
@@ -25,13 +21,13 @@ def stdout(s):
 
 class Solver:
 
-    def valid_toke(s, t):
+    def valid_toke(self, t):
         # print(t)
         valid = t.isidentifier() | t.split('**')[0].strip().isidentifier()
         # print(t.split('**')[0].strip().isidentifier(),'~',valid)
         return valid
 
-    def clean_t(s,t):
+    def clean_t(self, t):
         d = t.strip().replace("(", "").replace(")", "")
         o = d.split('**')
         if len(o)>1 and o[1]:
@@ -39,7 +35,7 @@ class Solver:
             # print(d)
         return d
 
-    def get_tokes(s, eqn):
+    def get_tokes(self, eqn):
         """
         Assumes equations are symbol-separated by spaces
         Anything like math.sin(a**2) must be treated via conversion to Sympy syntax
@@ -48,9 +44,9 @@ class Solver:
         """
         tokes = set()
         for t in eqn.split(" "):
-            clean = s.clean_t(t)
+            clean = self.clean_t(t)
             # print(clean,clean.isidentifier())
-            if s.valid_toke(clean) and t not in {"ln", "log"}:
+            if self.valid_toke(clean) and t not in {"ln", "log"}:
                 tokes.add(clean)
             # else:
             #     print("invalid toke",clean)
@@ -73,14 +69,7 @@ class Solver:
             stdout(f"{TAB}@staticmethod")
             stdout(f'{TAB}def eqn_{eqn_n.replace("-","_")}__{token}({typed_args}):')
             stdout(f"{TAB}# {eqn.strip().replace('#','')}")
-            # try:
-            # print('*'*88)
-            # print(normal_form)
-            # print(Symbol(token))
             solns = solve(normal_form, (token))
-            # print(solns)
-            # print('*'*88)
-            # print('NORM',normal_form)
             if not len(solns):
                 print('FAILED on:',fr'{normal_form}',rf'{token}',sep='\n')
                 stdout(f"{TAB*2}pass # unable  to solve")
@@ -90,8 +79,6 @@ class Solver:
                 stdout(f"{TAB*2}{token} = {soln}")
                 stdout(f"{TAB*2}result.append({token})")
             stdout(TAB * 2 + f"return {token}")
-            # except:
-            # stdout(f"{TAB*2}pass #NotImplementedError")
 
     def analyze(self, infile: str):
         full_file_path = os.getcwd() +'/'+ infile
@@ -115,26 +102,26 @@ class SetupMethods:
             if o[0] == "_":
                 continue
             with open(os.getcwd() + "/chapters/" + o) as s:
-                for l in s.readlines():
+                for l in self.readlines():
                     if x := re.compile("\d{1,2}-\d{1,2}\w").findall(l):
                         eqn_number = x[0]
                         if len(l) < 10:
                             ix += 1
                             # print(ix, l.strip(), "needs name!")
 
-    def see_which_notes_are_valid_Python(s):
+    def see_which_notes_are_valid_Python(self):
         for o in os.listdir(os.getcwd() + "/chapters"):
             if o[0] == "_":
                 continue
             with open(os.getcwd() + "/chapters/" + o) as s:
                 eqn_number = ""
-                for l in s.readlines():
+                for l in self.readlines():
                     if x := re.compile("\d{1,2}-\d{1,2}").findall(l):
                         eqn_number = x[0]
                     if "=" in l and ":" not in l.split("=")[0]:
-                        s.parse_eqn(l.strip().split("#")[0])
+                        self.parse_eqn(l.strip().split("#")[0])
 
-    def parse_eqn(s, l):
+    def parse_eqn(self, l:str):
         try:
             eval(l)
         except SyntaxError as se:
@@ -151,17 +138,25 @@ def get_class_name(pyeqn_file: str):
     # ends in .pyeqn, length 6
     return "".join(x[0].upper() + x[1:] for x in pyeqn_file)[:-6]
 
-if __name__ == "__main__":
+def main(tab, type, std, outfile, infile):
     main_solver = Solver()
     # standard import
     stdout("from scipy import sqrt")
     stdout("from sympy import Piecewise,Eqn")
-    if not INFILE.endswith('.pyeqn'):
+    if not infile.endswith('.pyeqn'):
         raise ValueError("Must be .pyeqn file")
-    pyeqn_file = INFILE.split("_")
+    pyeqn_file = infile.split("_")
     cls_name = get_class_name(pyeqn_file)
     stdout(f"class {cls_name}:")
-    print(cls_name)
-    main_solver.analyze(INFILE)
+    main_solver.analyze(infile)
     # Run black on the file
-    subprocess.run(['black', OUTFILE])
+    subprocess.run(['black', outfile])
+
+if __name__ == "__main__":
+    TAB = "    "
+    TYPE = ": float"
+    STD = "WRITE"
+    
+    OUTFILE = "vakyume2.py"
+    INFILE = 'fluid_flow_vacuum_lines.pyeqn'
+    main(TAB, TYPE, OUTFILE, INFILE)
