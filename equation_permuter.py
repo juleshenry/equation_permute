@@ -68,18 +68,18 @@ class Solver:
             typed_args = str(f"{TYPE}, ").join(args)
             if typed_args:
                 typed_args += TYPE
-            print(typed_args)
+            # print(typed_args)
             token = token.split('**')[0]
             stdout(f"{TAB}@staticmethod")
             stdout(f'{TAB}def eqn_{eqn_n.replace("-","_")}__{token}({typed_args}):')
             stdout(f"{TAB}# {eqn.strip().replace('#','')}")
             # try:
-            print('*'*88)
-            print(normal_form)
-            print(Symbol(token))
+            # print('*'*88)
+            # print(normal_form)
+            # print(Symbol(token))
             solns = solve(normal_form, (token))
-            print(solns)
-            print('*'*88)
+            # print(solns)
+            # print('*'*88)
             # print('NORM',normal_form)
             if not len(solns):
                 print('FAILED on:',fr'{normal_form}',rf'{token}',sep='\n')
@@ -93,9 +93,10 @@ class Solver:
             # except:
             # stdout(f"{TAB*2}pass #NotImplementedError")
 
-    def analyze(s, i):
+    def analyze(self, i):
         root_dir = os.getcwd() + f'//{ROOT}//'
         get = list(filter(lambda x: i in x, os.listdir(root_dir)))[0]
+        print('xx',root_dir + get)
         with open(root_dir + get) as file:
             eqn_number = ""
             for l in file.readlines():
@@ -103,7 +104,7 @@ class Solver:
                     eqn_number = x[0]
                 if " = " in l:
                     # print("[DEBUG]",eqn_number)
-                    s.permute(l, eqn_number)
+                    self.permute(l, eqn_number)
 
 
 class SetupMethods:
@@ -148,20 +149,21 @@ class SetupMethods:
             pass
 
 
-def get_class_name(mods: str):
+def get_class_name(pyeqn_file: str):
     # ends in .pyeqn, length 6
-    return "".join(x[0].upper() + x[1:] for x in mods)[:-6]
+    return "".join(x[0].upper() + x[1:] for x in pyeqn_file)[:-6]
 
 if __name__ == "__main__":
-    X = Solver()
+    main_solver = Solver()
+    # standard import
+    stdout("from scipy import sqrt")
     for module in sorted(os.listdir(os.getcwd() + f"/{ROOT}")):
-        if not module.startswith('quad'):
+        if not module.endswith('.pyeqn'):
             continue
-        chap, mods = module.split("_")[0], module.split("_")[1:]
-        cls_name = get_class_name(mods)
-        stdout("from scipy import sqrt")
+        pyeqn_file = module.split("_")
+        cls_name = get_class_name(pyeqn_file)
         stdout(f"class {cls_name}:")
         print(cls_name)
-        X.analyze(chap)
+        main_solver.analyze(module)
     # Run black on the file
     subprocess.run(['black', OUTFILE])
