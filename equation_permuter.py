@@ -2,11 +2,18 @@ import os
 import re
 import time
 from sympy import Symbol, solve, log
+import subprocess
 
 TAB = "    "
 TYPE = ": float"
 STD = "WRITE"
-OUTFILE = "vakyume.py"
+OUTFILE = "vakyume2.py"
+_DEBUG = True
+ROOT = 'tests'
+
+def debug(s:str):
+    if _DEBUG:
+        print("[DEBUG]",s)
 
 def stdout(s):
     if STD == "WRITE":
@@ -15,10 +22,11 @@ def stdout(s):
     else:
         print(s)
 
+
 class Solver:
 
     def valid_toke(s, t):
-        print(t)
+        # print(t)
         valid = t.isidentifier() | t.split('**')[0].strip().isidentifier()
         # print(t.split('**')[0].strip().isidentifier(),'~',valid)
         return valid
@@ -44,27 +52,29 @@ class Solver:
             # print(clean,clean.isidentifier())
             if s.valid_toke(clean) and t not in {"ln", "log"}:
                 tokes.add(clean)
-            else:
-                print("invalid toke",clean)
+            # else:
+            #     print("invalid toke",clean)
         tokes = list(tokes)
-        print('tokes',tokes)
+        # print('tokes',tokes)
         return tokes
 
     def permute(s, eqn, eqn_n):
         tokes = s.get_tokes(eqn)
         normal_form = eqn.split("=")[1].strip() + " - " + eqn.split("=")[0].strip()
         for t in tokes:
-            print("investigating",t)
+            # print("investigating",t)
             args = sorted(filter(lambda x: x != t, tokes))
+            args = list(map(lambda x:x.split('**')[0].strip(), args))
             typed_args = str(f"{TYPE}, ").join(args)
             if typed_args:
                 typed_args += TYPE
+            print(typed_args)
             stdout(f"{TAB}@staticmethod")
             stdout(f'{TAB}def eqn_{eqn_n.replace("-","_")}__{t}({typed_args}):')
             stdout(f"{TAB}# {eqn.strip().replace('#','')}")
             try:
                 solns = solve(normal_form, Symbol(t))
-                print('NORM',normal_form)
+                # print('NORM',normal_form)
                 if not len(solns):
                     stdout(f"{TAB*2}pass # unable  to solve")
                     continue
@@ -77,7 +87,7 @@ class Solver:
                 stdout(f"{TAB*2}pass #NotImplementedError")
 
     def analyze(s, i):
-        root_dir = os.getcwd() + "/chapters/"
+        root_dir = os.getcwd() + f'//{ROOT}//'
         get = list(filter(lambda x: i in x, os.listdir(root_dir)))[0]
         with open(root_dir + get) as file:
             eqn_number = ""
@@ -85,7 +95,7 @@ class Solver:
                 if x := re.compile("\d{1,2}-\d{1,2}\w{,2}").findall(l):
                     eqn_number = x[0]
                 if " = " in l:
-                    print("[DEBUG]",eqn_number)
+                    # print("[DEBUG]",eqn_number)
                     s.permute(l, eqn_number)
 
 
@@ -104,7 +114,7 @@ class SetupMethods:
                         eqn_number = x[0]
                         if len(l) < 10:
                             ix += 1
-                            print(ix, l.strip(), "needs name!")
+                            # print(ix, l.strip(), "needs name!")
 
     def see_which_notes_are_valid_Python(s):
         for o in os.listdir(os.getcwd() + "/chapters"):
@@ -133,10 +143,13 @@ class SetupMethods:
 
 if __name__ == "__main__":
     X = Solver()
-    for modules in sorted(os.listdir(os.getcwd() + "/chapters")):
-        if modules[2].isalpha():
-            continue  # __.* files
-        chap, mods = modules.split("_")[0], modules.split("_")[1:]
+    for module in sorted(os.listdir(os.getcwd() + f"/{ROOT}")):
+        if not module.startswith('uni'):
+            continue
+        chap, mods = module.split("_")[0], module.split("_")[1:]
         cls_name = "".join(x[0].upper() + x[1:] for x in mods)[:-3]
-        stdout(f"\n\nclass {cls_name}:")
+        print(cls_name)
+        stdout(f"class {cls_name}:")
         X.analyze(chap)
+    # Run black on the file
+    subprocess.run(['black', OUTFILE])
