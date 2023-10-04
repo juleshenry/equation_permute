@@ -1,6 +1,8 @@
 # These were used to convert notes to code and check formatting
 # This class can be used on a .pyeqn file to confirm which equations are valid
-import re,os
+import re, os
+
+
 class PyEqnValidator:
     @staticmethod
     def reveal_blank_eqn_names():
@@ -8,8 +10,8 @@ class PyEqnValidator:
         for o in os.listdir(os.getcwd() + "/chapters"):
             if o[0] == "_":
                 continue
-            with open(os.getcwd() + "/chapters/" + o) as s:
-                for l in self.readlines():
+            with open(os.getcwd() + "/chapters/" + o) as file:
+                for l in file.readlines():
                     if x := re.compile("\d{1,2}-\d{1,2}\w").findall(l):
                         eqn_number = x[0]
                         if len(l) < 10:
@@ -20,15 +22,15 @@ class PyEqnValidator:
         for o in os.listdir(os.getcwd() + "/chapters"):
             if o[0] == "_":
                 continue
-            with open(os.getcwd() + "/chapters/" + o) as s:
+            with open(os.getcwd() + "/chapters/" + o) as file:
                 eqn_number = ""
-                for l in self.readlines():
+                for l in file.readlines():
                     if x := re.compile("\d{1,2}-\d{1,2}").findall(l):
                         eqn_number = x[0]
                     if "=" in l and ":" not in l.split("=")[0]:
                         self.parse_eqn(l.strip().split("#")[0])
 
-    def parse_eqn(self, l:str):
+    def parse_eqn(self, l: str):
         try:
             eval(l)
         except SyntaxError as se:
@@ -39,4 +41,3 @@ class PyEqnValidator:
             print(l)
         except NameError as ne:
             pass
-
