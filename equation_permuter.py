@@ -96,18 +96,32 @@ class Solver:
                     self.permute(l, eqn_number)
 
 
-def get_class_name(pyeqn_file: str):
+def get_class_name(pyeqn_file_path: str):
     # ends in .pyeqn, length 6
-    return "".join(x[0].upper() + x[1:] for x in pyeqn_file)[:-6]
+    # print(pyeqn_file_path)
+    pyeqn_file = pyeqn_file_path
+    return "".join(x[0].upper() + x[1:] for x in pyeqn_file)[:-6].split('/')[-1]
 
+def empty_file(file_path):
+    with open(file_path, 'w'):
+        pass
 
-def main(tab, typehint, outfile, infile):
+def main(tab, typehint, infile, outfile):
+    # Check if the file is empty
+    if os.path.getsize(os.getcwd() + '/'+outfile) != 0:
+        print(f"The file {outfile} already exists. Overwrite? y/n")
+        x = input()
+        if x.lower() == 'y':
+            empty_file(outfile)
+        else:
+            raise ValueError("File exists already.")
+    
     s = Solver(tab, typehint, outfile)
-    # standard import
+    # standard imports
     s.stdout("from scipy import sqrt")
     s.stdout("from sympy import Piecewise,Eqn")
     if not infile.endswith(".pyeqn"):
-        raise ValueError("Must be .pyeqn file")
+        raise ValueError(f"Bad Name : {infile}; Must be .pyeqn file")
     pyeqn_file = infile.split("_")
     cls_name = get_class_name(pyeqn_file)
     s.stdout(f"class {cls_name}:")
@@ -119,6 +133,6 @@ def main(tab, typehint, outfile, infile):
 if __name__ == "__main__":
     TAB = "    "
     TYPE = ": float"
-    OUTFILE = "out.py"
     INFILE = "fluid_flow_vacuum_lines.pyeqn"
-    main(TAB, TYPE, OUTFILE, INFILE)
+    OUTFILE = "out.py"
+    main(TAB, TYPE, INFILE, OUTFILE)

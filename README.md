@@ -1,4 +1,4 @@
-# equation_permute
+# Equation Permuter
 Some exploration of equation sets and n-order permutations 
 
 
@@ -20,5 +20,5 @@ Run poetry install to install the specified dependencies.
 
 # Usage
 
-```python go.py --tab "    " --std "WRITE" --outfile "permuted_equations.py"```
+```python go.py --tab "    " --infile "tests/linear_eqn.pyeqn" --outfile "permuted_equations.py"```
 

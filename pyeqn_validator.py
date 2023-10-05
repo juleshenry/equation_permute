@@ -4,13 +4,17 @@ import re, os
 
 
 class PyEqnValidator:
+
+    def __init__(self, infile: str):
+        self.infile = infile
+
     @staticmethod
     def reveal_blank_eqn_names():
         ix = 1
-        for o in os.listdir(os.getcwd() + "/chapters"):
+        for o in os.listdir(os.getcwd() + self.infile):
             if o[0] == "_":
                 continue
-            with open(os.getcwd() + "/chapters/" + o) as file:
+            with open(os.getcwd() + self.infile) as file:
                 for l in file.readlines():
                     if x := re.compile("\d{1,2}-\d{1,2}\w").findall(l):
                         eqn_number = x[0]
