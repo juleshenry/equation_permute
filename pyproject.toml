@@ -2,12 +2,13 @@
 name = "equation_solver"
 version = "0.1.0"
 description = "A tool for generating and analyzing mathematical equations."
+authors = ["Julián Henry"]
 
 [tool.poetry.dependencies]
-python = "^3.8"
-sympy = "^1.8"
+python = "^3.11"
+sympy = "^1.7.3"
 argparse = "^1.1.0"
-scipy = "^1.11.3"
+scipy = "^1.9"
 black = "^23.7.0"
 
 [tool.poetry.dev-dependencies]

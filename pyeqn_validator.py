@@ -1,7 +1,8 @@
 # These were used to convert notes to code and check formatting
-# This class can be used on a .pyeqn file to confirm which equations are valid
+# This class can be used on a .pyeqn file to print out which equations will be converted
 import re, os
 
+from equation_permuter import main
 
 class PyEqnValidator:
     def __init__(self, infile: str):
@@ -15,7 +16,7 @@ class PyEqnValidator:
                 # Use regular expression to find patterns like "1-2a"
                 # print(l)
                 if eqn_number := re.compile(self.eqn_regex).findall(l):
-                    print(eqn_number)
+                    print(eqn_number[0])
                 # Use regular expression to find patterns like "1-2"
                 if x := re.compile(self.eqn_regex).findall(l):
                     eqn_number = x[0]
@@ -36,7 +37,15 @@ class PyEqnValidator:
             # If there's a name error, ignore it
             pass
 
-if __name__ == '__main__':
-    infile = 'pyeqn_examples/simple.pyeqn'
+
+def parse_arguments():
+    parser = argparse.ArgumentParser(description="Custom Constants Parser")
+    parser.add_argument("--infile", default="pyeqn_examples/simple.pyeqn", help="Input file name")
+    return parser.parse_args()
+
+
+if __name__ == "__main__":
+    args = parse_arguments()
+    infile = args.infile
     pev = PyEqnValidator(infile)
     pev.reveal_blank_eqn_names()

@@ -1,16 +1,9 @@
 # Equation Permuter
-Some exploration of equation sets and n-order permutations 
+The purpose of this library is to convert formulae to a python library that, if possible, solves for every variable, given a single equation.
 
+The equations must be saved in a `.pyeqn` file. A .pyeqn file is markdown for formulae that uses Pythonic syntax to describe an equation.
 
-Given a corpus of mathematical equations, solves for every variable when possible.
-
-When second-order equations can be derived, they are computed and offered as methods to a final library.
-
-1. Equation-Set
-2. Solutions modulo all free variables
-3. Nth-order Combinations
-4. Library from equations
-
+You can validate your `.pyeqn` file with the pyeqn_validator.py script
 
 # Installation
 
@@ -20,5 +13,10 @@ Run poetry install to install the specified dependencies.
 
 # Usage
 
-```python go.py --tab "    " --infile "tests/linear_eqn.pyeqn" --outfile "permuted_equations.py"```
+Equation Permutation: 
+
+```python3 go.py --infile "tests/linear_eqn.pyeqn" --outfile "permuted_equations.py"```
+
+Pyeqn Validator:
+```python3 pyeqn_validator.py --infile "tests/linear_eqn.pyeqn"```
 
