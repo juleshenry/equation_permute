@@ -4,12 +4,10 @@ import re, os
 
 
 class PyEqnValidator:
-
     def __init__(self, infile: str):
         self.infile = infile
 
-    @staticmethod
-    def reveal_blank_eqn_names():
+    def reveal_blank_eqn_names(self):
         ix = 1
         for o in os.listdir(os.getcwd() + self.infile):
             if o[0] == "_":
