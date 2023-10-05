@@ -108,13 +108,17 @@ def empty_file(file_path):
 
 def main(tab, typehint, infile, outfile):
     # Check if the file is empty
-    if os.path.getsize(os.getcwd() + '/'+outfile) != 0:
-        print(f"The file {outfile} already exists. Overwrite? y/n")
-        x = input()
-        if x.lower() == 'y':
-            empty_file(outfile)
-        else:
-            raise ValueError("File exists already.")
+    try:
+        if os.path.getsize(os.getcwd() + '/'+outfile) != 0:
+            print(f"The file {outfile} already exists. Overwrite? y/n")
+            x = input()
+            if x.lower() == 'y':
+                empty_file(outfile)
+            else:
+                raise ValueError("File exists already.")
+    except FileNotFoundError:
+        print('Creating '+outfile)
+        pass
     
     s = Solver(tab, typehint, outfile)
     # standard imports
